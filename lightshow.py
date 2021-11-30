@@ -21,32 +21,40 @@ QOS = 2
 PAUSE = .45
 PIN_LIST = [26, 13, 22, 27, 6, 5, 0, 4]
 
-REGISTERED_KEYS = ("e", "f", "g", "a", "b", "c", "d", "k", "l")
+REGISTERED_KEYS = (
+    "e", "f", "g", "a", "b", "c", "d"  # these are the note keys
+    "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"  # these are the flourish keys
+)
 
-sched = sched.scheduler(time.time, time.sleep)
+SCHED = sched.scheduler(time.time, time.sleep)
 
-# loop through pins and set mode and state to 'low'
+
 def setup(pin):
     GPIO.setup(pin, GPIO.OUT)
     GPIO.output(pin, GPIO.HIGH)
+
 
 def cleanup():
     GPIO.cleanup()
     logger.debug("Cleaning up")
 
+
 def powerup(pin):
     # logger.debug("pin: {0}".format(pin))
     powerdown(pin)
     GPIO.output(pin, GPIO.LOW)
-    sched.enter(PAUSE, 1, powerdown, argument=[pin])
+    SCHED.enter(PAUSE, 1, powerdown, argument=[pin])
+
 
 def powerdown(pin):
     # logger.debug("pin: {0}".format(pin))
     GPIO.output(pin, GPIO.HIGH)
 
+
 def entry():
     for pin in PIN_LIST:
         setup(pin)
+
 
 def on_connect(client, userdata, flags, rc):
     """
@@ -55,7 +63,9 @@ def on_connect(client, userdata, flags, rc):
     """
     logger.debug("Connected With Result Code: {}".format(rc))
 
+
 def press(x):
+    """ Music keys """
     if x == "e":
         powerup(26)
     if x == "f":
@@ -70,36 +80,46 @@ def press(x):
         powerup(5)
     if x == "d":
         powerup(0)
-    if x == "k":
-        powerup(4)
+
+    """ Flourish keys """
+    if x == "0":
+        for pin in PIN_LIST:
+            GPIO.output(pin, GPIO.LOW)
+    if x == "1":
+        for pin in PIN_LIST:
+            powerdown(pin)
+    if x == "2":
         powerup(26)
-    if x == "l":
         powerup(13)
+    if x == "3":
+        powerup(13)
+        powerup(22)
+    if x == "4":
+        powerup(27)
+        powerup(6)
+    if x == "5":
+        powerup(6)
+        powerup(5)
+    if x == "6":
+        powerup(5)
+        powerup(0)
+    if x == "7":
+        powerup(26)
+        powerup(13)
+        powerup(22)
+    if x == "8":
+        powerup(27)
+        powerup(6)
+        powerup(5)
+        powerup(0)
+    if x == "9":
+        powerup(26)
+        powerup(22)
+        powerup(6)
         powerup(5)
 
-    _thread.start_new_thread(sched.run, ())
+    _thread.start_new_thread(SCHED.run, ())
 
-# def release(x):
-#     if x == "e":
-#         powerdown(26)
-#     if x == "f":
-#         powerdown(13)
-#     if x == "g":
-#         powerdown(22)
-#     if x == "a":
-#         powerdown(27)
-#     if x == "b":
-#         powerdown(6)
-#     if x == "c":
-#         powerdown(5)
-#     if x == "d":
-#         powerdown(0)
-#     if x == "k":
-#         powerdown(4)
-#         powerdown(26)
-#     if x == "l":
-#         powerdown(13)
-#         powerdown(5)
 
 def on_message(client, userdata, message):
     """
@@ -116,9 +136,7 @@ def on_message(client, userdata, message):
 
     if t == TOPIC_ON:
         press(x)
-    # if t == TOPIC_OFF:
-        # release(x)
-        # sched.run()
+
 
 def main():
 
