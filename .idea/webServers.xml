@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="1df174d3-260b-46bc-a117-8205f638e67a" name="alleycat">
+        <fileTransfer rootFolder="/home/pi" accessType="SFTP" host="192.168.68.121" port="22" sshConfigId="2698b029-4cd5-4666-a883-591d96fd452f" sshConfig="pi@192.168.68.121:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
