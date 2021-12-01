@@ -82,7 +82,7 @@ def press(x):
         powerup(0)
 
     """ Flourish keys """
-    logger.debug(x)
+    # logger.debug(x)
     if x == "0":
         for pin in PIN_LIST:
             GPIO.output(pin, GPIO.HIGH)

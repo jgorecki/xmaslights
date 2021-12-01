@@ -2,6 +2,7 @@ from pynput import keyboard
 import paho.mqtt.client as mqtt
 from loguru import logger
 import playsound
+import json
 
 """THIS FILE RESIDES ON THE CLIENT AND MUST BE ACTIVE RUNNING PYTHON3 (NOT PYTHON2)"""
 
@@ -16,7 +17,6 @@ REGISTERED_KEYS = (
     "e", "f", "g", "a", "b", "c", "d",  # these are the note keys
     "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"  # these are the flourish keys
 )
-
 
 class MusicController:
 
@@ -75,10 +75,10 @@ class MusicController:
 
 if __name__ == "__main__":
     try:
-        logger.info("JINGLE BELLS E E E - E E E - E G C D E - - -"
-                    "F  F  F  F  F E E EE E D D E D "
-                    "- G E E E - E E E - E G C D E - - - "
-                    "F  F  F  F  F E E EE G G F D C")
+        print("JINGLE BELLS E E E - E E E - E G C D E - - -"
+              "F  F  F  F  F E E EE E D D E D "
+              "- G E E E - E E E - E G C D E - - - "
+              "F  F  F  F  F E E EE G G F D C")
 
         music_controller = MusicController()
         with keyboard.Listener(on_press=music_controller.on_press,
