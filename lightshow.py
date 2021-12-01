@@ -82,12 +82,13 @@ def press(x):
         powerup(0)
 
     """ Flourish keys """
+    logger.debug(x)
     if x == "0":
         for pin in PIN_LIST:
-            GPIO.output(pin, GPIO.LOW)
+            GPIO.output(pin, GPIO.HIGH)
     if x == "1":
         for pin in PIN_LIST:
-            powerdown(pin)
+            GPIO.output(pin, GPIO.LOW)
     if x == "2":
         powerup(26)
         powerup(13)

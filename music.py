@@ -13,7 +13,7 @@ CLIENT_ID = None
 QOS = 2
 
 REGISTERED_KEYS = (
-    "e", "f", "g", "a", "b", "c", "d"  # these are the note keys
+    "e", "f", "g", "a", "b", "c", "d",  # these are the note keys
     "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"  # these are the flourish keys
 )
 
@@ -51,10 +51,10 @@ class MusicController:
                     self.send_publication(TOPIC_ON, "{0}".format(key.char))
                     self.is_down = True
                 else:
-                    # logger.info("This press key is un-registered")
+                    logger.info("This press key is un-registered")
                     pass
             except AttributeError:
-                # logger.warning('special key {0} pressed'.format(key))
+                logger.warning('special key {0} pressed'.format(key))
                 pass
         else:
             # logger.warning("They are holding the key down.")
