@@ -5,10 +5,17 @@ from loguru import logger
 import click
 
 @click.command()
-@click.option('--task', prompt='Choose ta song to play: '
+@click.option('--task', prompt='Choose a song to play: '
                                '0 {Jingle Bells}, '
                                '1 {Away in a manger}, '
-                               '2 {We wish you a merry christmas}, ')
+                               '2 {We wish you a merry christmas}, '
+                               'Choose an animation to play: '
+                               'j {Joe}: '
+                               'a {Alex}: '
+                               'z {Zach}: '
+                               'c {Colleen}: '
+                               'd {Journey}: '
+            )
 def entry(task):
 
     j = 'songs/jinglebells.json'
@@ -21,6 +28,21 @@ def entry(task):
 
     elif int(task) == 2:
         j = 'songs/wewishyouamerrychristmas.json'
+
+    elif task == "j":    
+        j = 'animations/joe.json'
+
+    elif task == "a":    
+        j = 'animations/alex.json'
+
+    elif task == "z":    
+        j = 'animations/zach.json'
+
+    elif task == "c":    
+        j = 'animations/colleen.json'
+
+    elif task == "d":    
+        j = 'animations/journey.json'                        
 
     f = open(j)
 
@@ -35,11 +57,20 @@ def entry(task):
     while i < loops:
         for note in notes:
             # logger.debug(note)
-            music_controller.play_note_if_available(note.lower())
-            music_controller.send_publication(music.TOPIC_ON, "{0}".format(note.lower()))
-            time.sleep(pause * .45)
+            if note == ".":
+                time.sleep(pause * .45) # this is a delay
+            if note == "-":
+                time.sleep(1) # this is a pause
+            else:
+                music_controller.play_note_if_available(note.lower())
+                # music_controller.send_publication(music.TOPIC_ON, "{0}".format(note.lower()))
+                time.sleep(pause * .45)
         # logger.warning("loop...")
         i = i + 1
+    
+    # Always end with the lights on
+    time.sleep(2)
+    music_controller.send_publication(music.TOPIC_ON, "1")
 
     f.close()
 
