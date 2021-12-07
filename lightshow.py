@@ -5,20 +5,18 @@ import paho.mqtt.client as mqtt
 from loguru import logger
 import sched
 import _thread
+import json
 
 """THIS FILE RESIDES ON THE PI AND MUST BE ACTIVE RUNNING PYTHON3 (NOT PYTHON2)"""
 
 GPIO.setmode(GPIO.BCM)
 
-# BROKER_HOST = "test.mosquitto.org"
-BROKER_HOST = "192.168.68.121"
+BROKER_HOST = "raspberrypi.local"
 BROKER_PORT = 1883
 TOPIC_ON = "LIGHTSHOW_ON"
 TOPIC_OFF = "LIGHTSHOW_OFF"
 CLIENT_ID = None
 QOS = 2
-
-PAUSE = .45
 PIN_LIST = [26, 13, 22, 27, 6, 5, 0, 4]
 
 REGISTERED_KEYS = (
@@ -39,11 +37,11 @@ def cleanup():
     logger.debug("Cleaning up")
 
 
-def powerup(pin):
+def powerup(pin, runtime):
     # logger.debug("pin: {0}".format(pin))
     powerdown(pin)
     GPIO.output(pin, GPIO.LOW)
-    SCHED.enter(PAUSE, 1, powerdown, argument=[pin])
+    SCHED.enter(runtime, 1, powerdown, argument=[pin])
 
 
 def powerdown(pin):
@@ -64,22 +62,22 @@ def on_connect(client, userdata, flags, rc):
     logger.debug("Connected With Result Code: {}".format(rc))
 
 
-def press(x):
+def press(x, runtime):
     """ Music keys """
     if x == "e":
-        powerup(26)
+        powerup(26, runtime)
     if x == "f":
-        powerup(13)
+        powerup(13, runtime)
     if x == "g":
-        powerup(22)
+        powerup(22, runtime)
     if x == "a":
-        powerup(27)
+        powerup(27, runtime)
     if x == "b":
-        powerup(6)
+        powerup(6, runtime)
     if x == "c":
-        powerup(5)
+        powerup(5, runtime)
     if x == "d":
-        powerup(0)
+        powerup(0, runtime)
 
     """ Flourish keys """
     # logger.debug(x)
@@ -90,34 +88,34 @@ def press(x):
         for pin in PIN_LIST:
             GPIO.output(pin, GPIO.LOW)
     if x == "2":
-        powerup(26)
-        powerup(13)
+        powerup(26, runtime)
+        powerup(13, runtime)
     if x == "3":
-        powerup(13)
-        powerup(22)
+        powerup(13, runtime)
+        powerup(22, runtime)
     if x == "4":
-        powerup(27)
-        powerup(6)
+        powerup(27, runtime)
+        powerup(6, runtime)
     if x == "5":
-        powerup(6)
-        powerup(5)
+        powerup(6, runtime)
+        powerup(5, runtime)
     if x == "6":
-        powerup(5)
-        powerup(0)
+        powerup(5, runtime)
+        powerup(0, runtime)
     if x == "7":
-        powerup(26)
-        powerup(13)
-        powerup(22)
+        powerup(26, runtime)
+        powerup(13, runtime)
+        powerup(22, runtime)
     if x == "8":
-        powerup(27)
-        powerup(6)
-        powerup(5)
-        powerup(0)
+        powerup(27, runtime)
+        powerup(6, runtime)
+        powerup(5, runtime)
+        powerup(0, runtime)
     if x == "9":
-        powerup(26)
-        powerup(22)
-        powerup(6)
-        powerup(5)
+        powerup(26, runtime)
+        powerup(22, runtime)
+        powerup(6, runtime)
+        powerup(5, runtime)
 
     _thread.start_new_thread(SCHED.run, ())
 
@@ -132,11 +130,11 @@ def on_message(client, userdata, message):
     # for pin in pinList:
     #     powerdown(pin)
 
-    x = message.payload.decode("utf-8")
+    x = json.loads(message.payload.decode("utf-8"))
     t = message.topic
 
     if t == TOPIC_ON:
-        press(x)
+        press(x["key"], x["runtime"])
 
 
 def main():
@@ -152,7 +150,7 @@ def main():
         client.connect(BROKER_HOST, BROKER_PORT)
 
         """Topic subscription. For multiples ... use a list of tuples [('topic', qs), (topic, qs)]"""
-        client.subscribe([(TOPIC_ON, 2), (TOPIC_OFF, 2)])
+        client.subscribe([(TOPIC_ON, QOS), ])
 
         """Blocking loop."""
         client.loop_forever()

@@ -3,6 +3,7 @@ import paho.mqtt.client as mqtt
 from loguru import logger
 import playsound
 import json
+from helpers import encode_json_for_mqtt
 
 """THIS FILE RESIDES ON THE CLIENT AND MUST BE ACTIVE RUNNING PYTHON3 (NOT PYTHON2)"""
 
@@ -10,9 +11,10 @@ import json
 BROKER_HOST = "raspberrypi.local"
 BROKER_PORT = 1883
 TOPIC_ON = "LIGHTSHOW_ON"
-TOPIC_OFF = "LIGHTSHOW_OFF"
+TOPIC_OFF = "LIGHTSHOW_OFF" # This is unused.
 CLIENT_ID = None
 QOS = 2
+PAUSE = .45
 
 REGISTERED_KEYS = (
     "e", "f", "g", "a", "b", "c", "d",  # these are the note keys
@@ -49,7 +51,7 @@ class MusicController:
             try:
                 if "{0}".format(key.char) in REGISTERED_KEYS:
                     self.play_note_if_available(key.char)
-                    self.send_publication(TOPIC_ON, "{0}".format(key.char))
+                    self.send_publication(TOPIC_ON, encode_json_for_mqtt("{0}".format(key.char), PAUSE))
                     self.is_down = True
                 else:
                     logger.info("This press key is un-registered")
@@ -64,7 +66,7 @@ class MusicController:
     def on_release(self, key):
         try:
             if "{0}".format(key.char) in REGISTERED_KEYS:
-                self.send_publication(TOPIC_OFF, "{0}".format(key.char))
+                # self.send_publication(TOPIC_OFF, "{0}".format(key.char))
                 self.is_down = False
             else:
                 # logger.warning("This release key is un-registered")
