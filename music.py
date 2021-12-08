@@ -5,6 +5,7 @@ import playsound
 import json
 import time
 import click
+from helpers import encode_json_for_mqtt
 
 
 """THIS FILE RESIDES ON THE CLIENT AND MUST BE ACTIVE RUNNING PYTHON3 (NOT PYTHON2)"""
@@ -20,7 +21,8 @@ PAUSE = .45
 
 REGISTERED_KEYS = (
     "e", "f", "g", "a", "b", "c", "d",  # these are the note keys
-    "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"  # these are the flourish keys
+    "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",  # these are the flourish keys
+    ".", "-"
 )
 
 class MusicController:
@@ -56,25 +58,28 @@ class MusicController:
         self.user_notes.append(key)
         if len(self.user_notes) == len(self.song_notes):
             score = sum(1 for x,y in zip(self.song_notes,self.user_notes) if x == y) / len(self.song_notes)
+            print("")
             print("COMPLETE!")
+            print("")
             print("You're final score is: {0}!".format(score))
             print("-"  * 1000)
+            print("")
             time.sleep(3)
             raise KeyboardInterrupt
 
     def on_press(self, key):
         if not self.is_down:
-            self.gamify(key.char.upper()) # save the down pressed keu to the user's key presses
             try:
+                self.gamify(key.char.upper()) # save the down pressed keu to the user's key presses
                 if "{0}".format(key.char) in REGISTERED_KEYS:
                     self.play_note_if_available(key.char)
-                    self.send_publication(TOPIC_ON, encode_json_for_mqtt("{0}".format(key.char), PAUSE))
+                    # self.send_publication(TOPIC_ON, encode_json_for_mqtt("{0}".format(key.char), PAUSE))
                     self.is_down = True
                 else:
-                    logger.info("This press key is un-registered")
+                    # logger.info("This press key is un-registered")
                     pass
             except AttributeError:
-                logger.warning('special key {0} pressed'.format(key))
+                # logger.warning('special key {0} pressed'.format(key))
                 pass
         else:
             # logger.warning("They are holding the key down.")
