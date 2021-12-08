@@ -50,32 +50,31 @@ def entry(task):
     notes = song["notes"]
     loops = song["loops"]
     pause = song["pause"]
-    runtime = song["runtime"]
 
     logger.info(notes)
 
     music_controller = music.MusicController()
 
     # Always flash the lights off
-    music_controller.send_publication(music.TOPIC_ON, encode_json_for_mqtt("0", runtime))
+    music_controller.send_publication(music.TOPIC_ON, encode_json_for_mqtt("0", pause))
 
     i = 0
     while i < loops:
         for note in notes:
             logger.debug(note)
             if note == ".":
-                time.sleep(pause * .45) # this is a delay
+                time.sleep(float(pause) * .45) # this is a delay
             if note == "-":
-                time.sleep(1) # this is a pause
+                time.sleep(float(pause)) # this is a pause
             else:
                 music_controller.play_note_if_available(note.lower())
-                music_controller.send_publication(music.TOPIC_ON, encode_json_for_mqtt("{0}".format(note.lower()), runtime))
-                time.sleep(pause * .45)
+                music_controller.send_publication(music.TOPIC_ON, encode_json_for_mqtt("{0}".format(note.lower()), float(pause)))
+                time.sleep(float(pause) * .45 + float(pause))
         # logger.warning("loop...")
         i = i + 1
     
     # Always end with the lights on
-    music_controller.send_publication(music.TOPIC_ON, encode_json_for_mqtt("1", runtime))
+    music_controller.send_publication(music.TOPIC_ON, encode_json_for_mqtt("1", pause))
 
     f.close()
 

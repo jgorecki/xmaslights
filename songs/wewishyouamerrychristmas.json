@@ -1,7 +1,6 @@
 {
-	"loops": 1,
-	"pause": 1,
-	"runtime": 1,
+	"loops": 2,
+	"pause": "1.0",
 	"notes": [
 		"G", "C", "C", "D", "C", "B", "A", "A", "A",
 		"D", "D", "E", "D", "C", "B", "G", "G",

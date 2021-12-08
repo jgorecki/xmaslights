@@ -131,6 +131,7 @@ def on_message(client, userdata, message):
     #     powerdown(pin)
 
     x = json.loads(message.payload.decode("utf-8"))
+    logger.debug("json: {0}".format(x))
     t = message.topic
 
     if t == TOPIC_ON:
