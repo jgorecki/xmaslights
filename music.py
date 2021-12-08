@@ -6,6 +6,7 @@ import json
 import time
 import click
 from helpers import encode_json_for_mqtt
+from random import randint
 
 
 """THIS FILE RESIDES ON THE CLIENT AND MUST BE ACTIVE RUNNING PYTHON3 (NOT PYTHON2)"""
