@@ -3,7 +3,9 @@ import paho.mqtt.client as mqtt
 from loguru import logger
 import playsound
 import json
-from helpers import encode_json_for_mqtt
+import time
+import click
+
 
 """THIS FILE RESIDES ON THE CLIENT AND MUST BE ACTIVE RUNNING PYTHON3 (NOT PYTHON2)"""
 
@@ -26,8 +28,12 @@ class MusicController:
     is_down = False
     is_connect = False
 
-    def __init__(self):
-        pass
+    song_notes = []
+    user_notes = []
+
+    def __init__(self, song_notes, song_loops):
+        self.song_notes = song_notes
+        self.song_loops = song_loops
 
     def on_connect(self, client, userdata, flags, rc):
         self.is_connect = True
@@ -46,8 +52,19 @@ class MusicController:
         except playsound.PlaysoundException as err:
             pass
 
+    def gamify(self, key):
+        self.user_notes.append(key)
+        if len(self.user_notes) == len(self.song_notes):
+            score = sum(1 for x,y in zip(self.song_notes,self.user_notes) if x == y) / len(self.song_notes)
+            print("COMPLETE!")
+            print("You're final score is: {0}!".format(score))
+            print("-"  * 1000)
+            time.sleep(3)
+            raise KeyboardInterrupt
+
     def on_press(self, key):
         if not self.is_down:
+            self.gamify(key.char.upper()) # save the down pressed keu to the user's key presses
             try:
                 if "{0}".format(key.char) in REGISTERED_KEYS:
                     self.play_note_if_available(key.char)
@@ -76,16 +93,42 @@ class MusicController:
             # print('special key {0} pressed'.format(key))
 
 
-if __name__ == "__main__":
-    try:
-        print("JINGLE BELLS E E E - E E E - E G C D E - - -"
-              "F  F  F  F  F E E EE E D D E D "
-              "- G E E E - E E E - E G C D E - - - "
-              "F  F  F  F  F E E EE G G F D C")
+@click.command()
+@click.option('--task', prompt='Choose a song to play: '
+                               '0 {Jingle Bells}, '
+                               '1 {Away in a manger}, '
+                               '2 {We wish you a merry christmas}'
+                               )
+def entry(task):
 
-        music_controller = MusicController()
+    try:
+
+        j = 'songs/jinglebells.json'
+
+        if int(task) == 0:
+            j = 'songs/jinglebells.json'
+
+        elif int(task) == 1:
+            j = 'songs/awayinamanger.json'
+
+        elif int(task) == 2:
+            j = 'songs/wewishyouamerrychristmas.json'
+            
+        f = open(j)
+
+        song = json.load(f)
+        notes = song["notes"]
+        loops = song["loops"]
+
+        print("Hi.  You'll be playing {0} loops of this song. '.' and '-' count.".format(loops))
+        print(notes)
+
+        music_controller = MusicController(notes, loops)
         with keyboard.Listener(on_press=music_controller.on_press,
                                on_release=music_controller.on_release) as listener:
             listener.join()
     except KeyboardInterrupt:
         logger.info("Quiting Program")
+
+if __name__ == "__main__":
+    entry()
