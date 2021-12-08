@@ -29,13 +29,15 @@ class MusicController:
 
     is_down = False
     is_connect = False
+    is_game = False
 
     song_notes = []
     user_notes = []
 
-    def __init__(self, song_notes, song_loops):
+    def __init__(self, song_notes, song_loops, is_game):
         self.song_notes = song_notes
         self.song_loops = song_loops
+        self.is_game = is_game
 
     def on_connect(self, client, userdata, flags, rc):
         self.is_connect = True
@@ -70,7 +72,8 @@ class MusicController:
     def on_press(self, key):
         if not self.is_down:
             try:
-                self.gamify(key.char.upper()) # save the down pressed keu to the user's key presses
+                if self.is_game:
+                    self.gamify(key.char.upper()) # save the down pressed keu to the user's key presses
                 if "{0}".format(key.char) in REGISTERED_KEYS:
                     self.play_note_if_available(key.char)
                     # self.send_publication(TOPIC_ON, encode_json_for_mqtt("{0}".format(key.char), PAUSE))
@@ -103,21 +106,27 @@ class MusicController:
                                '0 {Jingle Bells}, '
                                '1 {Away in a manger}, '
                                '2 {We wish you a merry christmas}'
-                               )
+)
+
 def entry(task):
 
     try:
 
         j = 'songs/jinglebells.json'
 
-        if int(task) == 0:
+        is_game = True
+
+        if task == "0":
             j = 'songs/jinglebells.json'
 
-        elif int(task) == 1:
+        elif task == "1":
             j = 'songs/awayinamanger.json'
 
-        elif int(task) == 2:
+        elif task == "2":
             j = 'songs/wewishyouamerrychristmas.json'
+        
+        elif task == "777":
+            j = 'songs/test.json'                       
             
         f = open(j)
 
@@ -128,7 +137,7 @@ def entry(task):
         print("Hi.  You'll be playing {0} loops of this song. '.' and '-' count.".format(loops))
         print(notes)
 
-        music_controller = MusicController(notes, loops)
+        music_controller = MusicController(notes, loops, is_game)
         with keyboard.Listener(on_press=music_controller.on_press,
                                on_release=music_controller.on_release) as listener:
             listener.join()
