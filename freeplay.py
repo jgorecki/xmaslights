@@ -57,26 +57,11 @@ class MusicController:
         except playsound.PlaysoundException as err:
             pass
 
-    def gamify(self, key):
-
-        if len(self.user_notes) == len(self.song_notes):
-            score = sum(1 for x, y in zip(self.song_notes, self.user_notes) if x == y) / len(self.song_notes)
-            print("")
-            print("COMPLETE!")
-            print("")
-            print("You're final score is: {0}!".format(score))
-            print("-" * 1000)
-            print("")
-            time.sleep(3)
-            raise KeyboardInterrupt
-        else:
-            self.user_notes.append(key)
-
     def on_press(self, key):
         if not self.is_down:
             try:
-                if self.is_game:
-                    self.gamify(key.char.upper()) # save the down pressed keu to the user's key presses
+                # if self.is_game:
+                #     self.gamify(key.char.upper()) # save the down pressed keu to the user's key presses
                 if "{0}".format(key.char) in REGISTERED_KEYS:
                     self.play_note_if_available(key.char)
                     self.send_publication(TOPIC_ON, encode_json_for_mqtt("{0}".format(key.char), PAUSE))
@@ -105,31 +90,13 @@ class MusicController:
 
 
 @click.command()
-@click.option('--task', prompt='Choose a song to play: '
-                               '0 {Jingle Bells}, '
-                               '1 {Away in a manger}, '
-                               '2 {We wish you a merry christmas}'
-)
-
+@click.option('--task', prompt='This is free play.  Music Notes (A, B, C, D, E, F, G) and (0-9) flourishes '
+                               'are available.  Hit any 1 to start.')
 def entry(task):
 
     try:
 
         j = 'songs/jinglebells.json'
-
-        is_game = True
-
-        if task == "0":
-            j = 'songs/jinglebells.json'
-
-        elif task == "1":
-            j = 'songs/awayinamanger.json'
-
-        elif task == "2":
-            j = 'songs/wewishyouamerrychristmas.json'
-        
-        elif task == "777":
-            j = 'songs/test.json'                       
             
         f = open(j)
 
@@ -137,10 +104,10 @@ def entry(task):
         notes = song["notes"]
         loops = song["loops"]
 
-        print("Hi.  You'll be playing {0} loops of this song. '.' and '-' count.".format(loops))
+        print("Hi.  I loaded this sonng for you to play, but you don't have too.")
         print(notes)
 
-        music_controller = MusicController(notes, loops, is_game)
+        music_controller = MusicController(notes, loops, False)
         with keyboard.Listener(on_press=music_controller.on_press,
                                on_release=music_controller.on_release) as listener:
             listener.join()
