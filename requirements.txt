@@ -1,10 +1,16 @@
-click==8.0.3
-loguru==0.5.3
-paho-mqtt==1.6.1
-playsound==1.3.0
-pynput==1.7.5
-pyobjc-core==8.0
-pyobjc-framework-ApplicationServices==8.0
-pyobjc-framework-Cocoa==8.0
-pyobjc-framework-Quartz==8.0
-six==1.16.0
+flask
+loguru
+paho-mqtt
+pip-chill
+playsound
+pynput
+# click # Installed as dependency for flask
+# itsdangerous # Installed as dependency for flask
+# jinja2 # Installed as dependency for flask
+# markupsafe # Installed as dependency for jinja2
+# pyobjc-core # Installed as dependency for pyobjc-framework-applicationservices, pyobjc-framework-cocoa, pyobjc-framework-quartz
+# pyobjc-framework-applicationservices # Installed as dependency for pynput
+# pyobjc-framework-cocoa # Installed as dependency for pyobjc-framework-applicationservices, pyobjc-framework-quartz
+# pyobjc-framework-quartz # Installed as dependency for pyobjc-framework-applicationservices, pynput
+# six # Installed as dependency for pynput
+# werkzeug # Installed as dependency for flask
