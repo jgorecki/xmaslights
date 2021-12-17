@@ -53,7 +53,7 @@ def entry(task):
 
     logger.info(notes)
 
-    music_controller = music.MusicController()
+    music_controller = music.MusicController(notes, loops, False)
 
     # Always flash the lights off
     music_controller.send_publication(music.TOPIC_ON, encode_json_for_mqtt("0", pause))

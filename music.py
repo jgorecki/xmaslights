@@ -64,8 +64,10 @@ class MusicController:
             print("")
             print("COMPLETE!")
             print("")
-            print("You're final score is: {0}!".format(score))
-            print("-" * 1000)
+            print("")
+            print("--- YOUR FINAL SCORE IS: {0}!!!!!!!".format(score * 100))
+            print("")
+            print("-" * 100)
             print("")
             time.sleep(3)
             raise KeyboardInterrupt
@@ -75,8 +77,6 @@ class MusicController:
     def on_press(self, key):
         if not self.is_down:
             try:
-                if self.is_game:
-                    self.gamify(key.char.upper()) # save the down pressed keu to the user's key presses
                 if "{0}".format(key.char) in REGISTERED_KEYS:
                     self.play_note_if_available(key.char)
                     self.send_publication(TOPIC_ON, encode_json_for_mqtt("{0}".format(key.char), PAUSE))
@@ -84,6 +84,8 @@ class MusicController:
                 else:
                     # logger.info("This press key is un-registered")
                     pass
+                if self.is_game:
+                    self.gamify(key.char.upper()) # save the down pressed keu to the user's key presses
             except AttributeError:
                 # logger.warning('special key {0} pressed'.format(key))
                 pass
@@ -107,7 +109,7 @@ class MusicController:
 @click.command()
 @click.option('--task', prompt='Choose a song to play: '
                                '0 {Jingle Bells}, '
-                               '1 {Away in a manger}, '
+                               '1 {Away in a manger (TERRIBLE)}, '
                                '2 {We wish you a merry christmas}'
 )
 
@@ -137,7 +139,7 @@ def entry(task):
         notes = song["notes"]
         loops = song["loops"]
 
-        print("Hi.  You'll be playing {0} loops of this song. '.' and '-' count.".format(loops))
+        print("Hi.  You'll be playing {0} loops of this song. '.' and '-' count in your score!  Play until you get your score.".format(loops))
         print(notes)
 
         music_controller = MusicController(notes, loops, is_game)
